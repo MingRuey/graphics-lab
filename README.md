@@ -1,5 +1,5 @@
 # DrawSvg
-Playground for a  SVG drawer from Scratch
+Playground for a learning OpenGL by build a Wolfenstein 3D scene from scratch.
 
 ## Build Process
 
