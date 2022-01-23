@@ -16,6 +16,7 @@ include_directories(include/glm)
 add_executable(main
         glad.c
         model/ObjLoader.cpp
+        shader/ShaderLoader.cpp
         main.cpp)
 
 target_link_libraries(main glfw)
