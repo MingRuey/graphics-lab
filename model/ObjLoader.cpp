@@ -8,7 +8,7 @@
 #include "ObjLoader.h"
 
 
-void parse_v_vn(const string &line, double &d1, double &d2, double &d3) {
+void parse_v_vn(const string &line, float &d1, float &d2, float &d3) {
     string skip;
     std::stringstream ss(line);
     ss >> skip;
@@ -43,7 +43,7 @@ ObjLoader::ObjLoader(string file) {
     }
 
     int l = 0;
-    double d1, d2, d3;
+    float d1, d2, d3;
     string line;
     while (std::getline(infile, line)) {
         l++;
