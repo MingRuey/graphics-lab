@@ -66,7 +66,7 @@ int main()
 
     // light data
     //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    float lightPos[] = { -2.0f, 0.0f, 3.0f };
+    float lightPos[] = { 2.0f, 2.0f, 2.0f };
     auto camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
     //auto view = glm::mat4(1.0f);
     //auto projection = glm::mat4(1.0f);
@@ -150,7 +150,8 @@ int main()
         loader.use();
         loader.setVec3("objectColor", objectColor);
 
-        loader.setVec3("lightPosition", lightPos);
+        loader.setVec3("lightPosition", &lightPos[0]);
+        loader.setVec3("vuewPosition", &camera.Position[0]);
         loader.setMat4("projMatrix", &projection[0][0]);
         loader.setMat4("viewMatrix", &view[0][0]);
         loader.setMat4("modelMatrix", &model[0][0]);
