@@ -1,0 +1,22 @@
+#version 330 core
+
+in vec4 normal;
+in vec3 halfVector;
+in vec3 lightdir;
+
+//layout(location=0) out vec4 fragmentColor;
+out vec4 fragmentColor;
+
+uniform vec3 objectColor;
+
+void main(void)
+{
+	vec3 n = normalize(normal.xyz);
+	vec3 h = normalize(halfVector);
+	vec3 l = normalize(lightdir);
+	
+	vec3 intensity = 0.1 +
+					+ 0.5 * objectColor * max( 0.0, dot(n, l) )
+					+ 0.5 * objectColor * pow( max( 0.0, dot(n, h) ), 1.1 );
+	fragmentColor = vec4( intensity, 1.0 );
+}
