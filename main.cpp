@@ -54,7 +54,7 @@ int main()
     // vertex shader
     //auto loader = ShaderLoader("../shader/projection.vert", "../shader/projection.frag");
     auto loader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/shaderBlinnPhong.fs");
-    auto lightShader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/simple.fs");
+    auto lightShader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/shaderBlinnPhong.fs");
     float* objectColor = new float[3];
     objectColor[0] = 1.0f;
     objectColor[1] = 0.5f;
@@ -67,7 +67,7 @@ int main()
 
     // light data
     //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    float lightPos[] = { -2.0f, -2.0f, 2.0f };
+    float lightPos[] = { -2.0f, 2.0f, 2.0f };
     auto camera = Camera(glm::vec3(0.0f, 0.0f, 4.0f));
     //auto view = glm::mat4(1.0f);
     //auto projection = glm::mat4(1.0f);
@@ -111,7 +111,7 @@ int main()
             vertices[i * 18 + j * 6 + 1] = vertex.y;
             vertices[i * 18 + j * 6 + 2] = vertex.z;
             vertices[i * 18 + j * 6 + 3] = normal.x;
-            vertices[i * 18 + j * 6 + 4] = normal.z;
+            vertices[i * 18 + j * 6 + 4] = normal.y;
             vertices[i * 18 + j * 6 + 5] = normal.z;
         }
     }
@@ -141,6 +141,9 @@ int main()
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -152,7 +155,7 @@ int main()
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw our first triangle
         
@@ -174,7 +177,7 @@ int main()
         lightShader.setVec3("vuewPosition", &camera.Position[0]);
         lightShader.setMat4("projMatrix", &projection[0][0]);
         lightShader.setMat4("viewMatrix", &view[0][0]);
-        auto model2 = glm::mat4(1.0f);
+        auto model2 = glm::mat4(model);
         model2 = glm::translate(model2, glm::vec3(0.0f,1.0f,0.0f));
         model2 = glm::scale(model2, glm::vec3(0.2f));
         lightShader.setMat4("modelMatrix", &model2[0][0]);
