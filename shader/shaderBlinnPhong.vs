@@ -5,6 +5,7 @@ layout (location = 1) in vec3 in_Normal;
 out vec4 normal;
 out vec3 halfVector;
 out vec3 lightdir;
+out vec3 position;
 
 uniform vec3 lightPosition;
 uniform vec3 viewPosition;
@@ -20,6 +21,7 @@ void main()
 	// position to world and then camera coordinate.
 	vec4 pos = viewMatrix * modelMatrix * vec4(in_Position, 1.0);
 	
+	position = in_Position;
 	normal = normalMatrix * vec4(in_Normal, 0.0);
 	vec3 v = normalize(viewPosition - in_Position);
 	lightdir = normalize(lightPosition - in_Position);

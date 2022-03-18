@@ -54,6 +54,7 @@ int main()
     // vertex shader
     //auto loader = ShaderLoader("../shader/projection.vert", "../shader/projection.frag");
     auto loader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/shaderBlinnPhong.fs");
+    auto lightShader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/simple.fs");
     float* objectColor = new float[3];
     objectColor[0] = 1.0f;
     objectColor[1] = 0.5f;
@@ -66,15 +67,15 @@ int main()
 
     // light data
     //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    float lightPos[] = { 2.0f, 2.0f, 2.0f };
-    auto camera = Camera(glm::vec3(0.0f, 0.0f, 2.0f));
+    float lightPos[] = { -2.0f, -2.0f, 2.0f };
+    auto camera = Camera(glm::vec3(0.0f, 0.0f, 4.0f));
     //auto view = glm::mat4(1.0f);
     //auto projection = glm::mat4(1.0f);
     auto view = camera.getViewMatrix();
     auto projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     auto model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     auto normalMatrix = glm::mat4(1.0f);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -124,10 +125,17 @@ int main()
     // VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(*vertices)* target.faces.size() * 3 * 3 * 2, vertices, GL_STATIC_DRAW);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(testVertices), &testVertices, GL_STATIC_DRAW);
-
 
     // VAO
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    unsigned int lightCubeVAO;
+    glGenVertexArrays(1, &lightCubeVAO);
+    glBindVertexArray(lightCubeVAO);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(0);
@@ -147,9 +155,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
+        
         loader.use();
         loader.setVec3("objectColor", objectColor);
-
         loader.setVec3("lightPosition", &lightPos[0]);
         loader.setVec3("vuewPosition", &camera.Position[0]);
         loader.setMat4("projMatrix", &projection[0][0]);
@@ -159,6 +167,21 @@ int main()
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 3*target.faces.size());
         // glBindVertexArray(0); // no need to unbind it every time
+        
+        lightShader.use();
+        lightShader.setVec3("objectColor", lightColor);
+        lightShader.setVec3("lightPosition", &lightPos[0]);
+        lightShader.setVec3("vuewPosition", &camera.Position[0]);
+        lightShader.setMat4("projMatrix", &projection[0][0]);
+        lightShader.setMat4("viewMatrix", &view[0][0]);
+        auto model2 = glm::mat4(1.0f);
+        model2 = glm::translate(model2, glm::vec3(0.0f,1.0f,0.0f));
+        model2 = glm::scale(model2, glm::vec3(0.2f));
+        lightShader.setMat4("modelMatrix", &model2[0][0]);
+        lightShader.setMat4("normalMatrix", &normalMatrix[0][0]);
+        glBindVertexArray(lightCubeVAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glDrawArrays(GL_TRIANGLES, 0, 3*target.faces.size());
+
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
