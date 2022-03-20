@@ -67,15 +67,16 @@ int main()
 
     // light data
     //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    float lightPos[] = { -2.0f, 2.0f, 2.0f };
+    float lightPos[] = { 0.0f, 0.0f, 4.0f };
     auto camera = Camera(glm::vec3(0.0f, 0.0f, 4.0f));
     //auto view = glm::mat4(1.0f);
     //auto projection = glm::mat4(1.0f);
     auto view = camera.getViewMatrix();
     auto projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     auto model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(-0.25f, -0.25f, -0.25f));
     auto normalMatrix = glm::mat4(1.0f);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes

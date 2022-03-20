@@ -18,12 +18,12 @@ void main()
 {
 	// Calculate lighting in eye space: transform the local
 	// position to world and then camera coordinate.
-	vec4 pos = viewMatrix * modelMatrix * vec4(in_Position, 1.0);
+	vec4 pos = modelMatrix * vec4(in_Position, 1.0);
 	
-	normal = vec4(in_Normal, 0.0);
-	vec3 v = normalize(viewPosition - in_Position);
-	lightdir = normalize(lightPosition - in_Position);
+	normal = modelMatrix * vec4(in_Normal, 0.0);
+	vec3 v = normalize(viewPosition - pos.xyz);
+	lightdir = normalize(lightPosition - pos.xyz);
 	halfVector = normalize(v + lightdir);
 	
-	gl_Position = projMatrix * pos;
+	gl_Position = projMatrix * viewMatrix * pos;
 }

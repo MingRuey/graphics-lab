@@ -15,8 +15,7 @@ void main(void)
 	vec3 l = normalize(lightdir);
 	
 	vec3 intensity = 0.1 
-					+ 1 * objectColor * max( 0.0, dot(n, l) )
-					+ 0.3 * objectColor * pow( max( 0.0, dot(n, h) ), 32 );
+					 + 1 * objectColor * max( 0.0, dot(n, l))
+					 + 2.8 * objectColor * pow( max( 0.0, dot(n, h) ), 3.5 );
 	fragmentColor = vec4( intensity, 1.0 );
-
 }
