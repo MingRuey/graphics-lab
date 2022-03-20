@@ -162,7 +162,7 @@ int main()
         loader.use();
         loader.setVec3("objectColor", objectColor);
         loader.setVec3("lightPosition", &lightPos[0]);
-        loader.setVec3("vuewPosition", &camera.Position[0]);
+        loader.setVec3("viewPosition", &camera.Position[0]);
         loader.setMat4("projMatrix", &projection[0][0]);
         loader.setMat4("viewMatrix", &view[0][0]);
         loader.setMat4("modelMatrix", &model[0][0]);
@@ -174,7 +174,7 @@ int main()
         lightShader.use();
         lightShader.setVec3("objectColor", lightColor);
         lightShader.setVec3("lightPosition", &lightPos[0]);
-        lightShader.setVec3("vuewPosition", &camera.Position[0]);
+        lightShader.setVec3("viewPosition", &camera.Position[0]);
         lightShader.setMat4("projMatrix", &projection[0][0]);
         lightShader.setMat4("viewMatrix", &view[0][0]);
         auto model2 = glm::mat4(model);
