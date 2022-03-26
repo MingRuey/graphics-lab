@@ -3,6 +3,7 @@
 
 #include <ft2build.h>
 #include <vector>
+#include <string>
 #include FT_FREETYPE_H
 
 using std::string;
@@ -14,3 +15,5 @@ public:
 	explicit FreeTypeManager(string filePath);
 	FT_Face GetFace();
 };
+
+#endif

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # glfw
 include_directories(lib)
-add_library(glfw STATIC IMPORTED model/ObjLoader.cpp model/ObjLoader.h camera/camera.cpp camera/camera.cpp)
+add_library(glfw STATIC IMPORTED model/ObjLoader.cpp model/ObjLoader.h camera/camera.h camera/camera.cpp)
 set_target_properties(glfw PROPERTIES
         IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw3.lib"
         INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -14,6 +14,7 @@ set_target_properties(glfw PROPERTIES
 add_library(freetype STATIC IMPORTED)
 set_target_properties(freetype PROPERTIES
 	IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype.lib"
+	INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 
