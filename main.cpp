@@ -7,6 +7,7 @@
 #include "model/ObjLoader.h"
 #include "shader/ShaderLoader.h"
 #include "camera/camera.h";
+#include "freetype/FreetypeManager.h";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -55,6 +56,7 @@ int main()
     //auto loader = ShaderLoader("../shader/projection.vert", "../shader/projection.frag");
     auto loader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/shaderBlinnPhong.fs");
     auto lightShader = ShaderLoader("../shader/shaderBlinnPhong.vs", "../shader/shaderBlinnPhong.fs");
+    auto textShader = ShaderLoader("../shader/textShader.vs", "../shader/textShader.fs");
     float* objectColor = new float[3];
     objectColor[0] = 1.0f;
     objectColor[1] = 0.5f;
@@ -117,6 +119,32 @@ int main()
         }
     }
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // Load Fonts
+    auto freeTypeManager = FreeTypeManager("../font/GreatVibes-Regular.ttf", 30);
+    std::cout << "Hello we are here!" << std::endl;
+    for (unsigned char c = 0; c < 128; c++) {
+        auto glyph = freeTypeManager.LoadChar(c);
+        auto bitMap = glyph->bitmap;
+        unsigned int charTexture;
+        glGenTextures(1, &charTexture);
+        glBindTexture(GL_TEXTURE_2D, charTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, bitMap.width, bitMap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, bitMap.buffer);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        freeTypeManager.StoreCharTexture(c, charTexture, glyph);
+    }
+    std::string text = std::string("hello");
+    float x = 0.5f;
+    float y = 0.5f;
+    float scale = 1;
+    glm::vec3 textColor = glm::vec3(1.0, 1.0, 1.0);
+    // Blend
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Create Data
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -144,6 +172,21 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    unsigned int textSquareVAO, textSquareVBO;
+    glGenVertexArrays(1, &textSquareVAO);
+    glGenBuffers(1, &textSquareVBO);
+    glBindVertexArray(textSquareVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, textSquareVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
 
     // render loop
     // -----------
@@ -186,6 +229,42 @@ int main()
         glBindVertexArray(lightCubeVAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 3*target.faces.size());
 
+        textShader.use();
+        textShader.setVec3("textColor", &textColor[0]);
+        lightShader.setMat4("projection", &projection[0][0]);
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(textSquareVAO);
+        std::string::const_iterator c;
+        for (c = text.begin(); c != text.end(); c++) {
+            auto charTexture = freeTypeManager.charMap[*c];
+
+            float xpos = x + charTexture.bearing.x * scale;
+            float ypos = y + (charTexture.size.y - charTexture.bearing.y) * scale;
+
+            float w = charTexture.size.x * scale;
+            float h = charTexture.size.y * scale;
+
+            float vertices[6][4] =
+            {
+                {xpos, ypos + h,0.0f,0.0f},
+                {xpos, ypos,0.0f,1.0f},
+                {xpos + w, ypos,1.0f,1.0f},
+
+                {xpos, ypos + h,0.0f,0.0f},
+                {xpos + w, ypos,1.0f,1.0f},
+                {xpos + w, ypos + h,1.0f,0.0f},
+            };
+            glBindTexture(GL_TEXTURE_2D, charTexture.textureId);
+            glBindBuffer(GL_ARRAY_BUFFER, textSquareVBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            x += (charTexture.advance >> 6) * scale;
+
+        }
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -221,3 +300,4 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
+
